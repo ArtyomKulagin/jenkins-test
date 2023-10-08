@@ -1,13 +1,11 @@
 pipeline {
 	agent none
   stages {
-  	stages {
        stage('Build') {
           steps {
             withMaven(maven: 'MAVEN_ENV') {
                 sh "mvn clean build"
             }
-          }
        }
     }
     stage('Docker Build') {
@@ -17,10 +15,10 @@ pipeline {
       }
     }
     stage('Docker Run') {
-        agent any
-      steps {
-        sh 'docker run -d -p 8080:8080 test/health-check:latest .'
-      }
+       agent any
+          steps {
+            sh 'docker run -d -p 8080:8080 test/health-check:latest .'
+          }
     }
   }
 }
