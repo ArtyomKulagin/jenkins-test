@@ -1,30 +1,26 @@
 pipeline {
-    agent any
-  environment {
-    MAVEN_ARGS=" -e clean install"
-    registry = ""
-    dockerContainerName = 'bookapi'
-    dockerImageName = 'bookapi-api'
-  }
+	agent none
   stages {
-    stage('Build') {
-       steps {
-   withMaven(maven: 'MAVEN_ENV') {
-            sh "mvn ${MAVEN_ARGS}"
+  	stage('Maven Install') {
+    	agent {
+      	docker {
+        	image 'maven:3.5.0'
         }
-       }
-    }
-
- stage('clean container') {
+      }
       steps {
-       sh 'docker ps -f name=${dockerContainerName} -q | xargs --no-run-if-empty docker container stop'
-       sh 'docker container ls -a -fname=${dockerContainerName} -q | xargs -r docker container rm'
-       sh 'docker images -q --filter=reference=${dockerImageName} | xargs --no-run-if-empty docker rmi -f'
+      	sh 'mvn clean install'
       }
     }
-  stage('docker-compose start') {
+    stage('Docker Build') {
+    	agent any
       steps {
-       sh 'docker compose up -d'
+      	sh 'docker build -t test/health-check:latest .'
+      }
+    }
+    stage('Docker Run') {
+        agent any
+      steps {
+        sh 'docker run -d -p 8080:8080 test/health-check:latest .'
       }
     }
   }
