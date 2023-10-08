@@ -1,24 +1,32 @@
+
 pipeline {
-	agent none
-  stages {
-       stage('Build') {
-          steps {
-            withMaven(maven: 'MAVEN_ENV') {
-                sh "mvn clean build"
+    agent any
+    tools {
+        maven 'maven-3.8.1'
+    }
+    environment {
+        DATE = new Date().format('yy.M')
+        TAG = "${DATE}.${BUILD_NUMBER}"
+    }
+    stages {
+        stage ('Build') {
+            steps {
+                sh 'mvn clean package'
             }
-       }
+        }
+        stage('Docker Build') {
+            steps {
+                script {
+                    docker.build("docker build -t test/health-check:latest .")
+                }
+            }
+        }
+        stage('Deploy'){
+            steps {
+                sh "docker stop test/health-check | true"
+                sh "docker rm test/health-check | true"
+                sh "docker run --name test/health-check -d -p 8080:8080 test/health-check:latest"
+            }
+        }
     }
-    stage('Docker Build') {
-    	agent any
-      steps {
-      	sh 'docker build -t test/health-check:latest .'
-      }
-    }
-    stage('Docker Run') {
-       agent any
-          steps {
-            sh 'docker run -d -p 8080:8080 test/health-check:latest .'
-          }
-    }
-  }
 }
