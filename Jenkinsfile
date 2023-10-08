@@ -17,7 +17,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    docker.build("docker build -t test/health-check .")
+                    docker.build("docker build -t test/health-check")
                 }
             }
         }
