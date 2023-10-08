@@ -17,15 +17,15 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    docker.build("docker build -t 'test/health-check'")
+                    docker.build("docker build -t health-check")
                 }
             }
         }
         stage('Deploy'){
             steps {
-                sh "docker stop test/health-check | true"
-                sh "docker rm test/health-check | true"
-                sh "docker run --name test/health-check -d -p 8080:8080 test/health-check"
+                sh "docker stop health-check | true"
+                sh "docker rm health-check | true"
+                sh "docker run --name health-check -d -p 8080:8080 health-check"
             }
         }
     }
