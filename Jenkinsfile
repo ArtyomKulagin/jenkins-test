@@ -17,7 +17,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    docker.build("docker build -t test/health-check:${TAG}")
+                    docker.build("docker build -t test/health-check .")
                 }
             }
         }
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 sh "docker stop test/health-check | true"
                 sh "docker rm test/health-check | true"
-                sh "docker run --name test/health-check -d -p 8080:8080 test/health-check:1"
+                sh "docker run --name test/health-check -d -p 8080:8080 test/health-check"
             }
         }
     }
