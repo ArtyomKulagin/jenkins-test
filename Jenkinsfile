@@ -25,7 +25,7 @@ pipeline {
             steps {
                 sh "docker stop test/health-check | true"
                 sh "docker rm test/health-check | true"
-                sh "docker run --name test/health-check:latest -d -p 8080:8080 test/health-check:latest"
+                sh "docker run -d -p 8080:8080 test/health-check:latest"
             }
         }
     }
