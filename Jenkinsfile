@@ -1,15 +1,14 @@
 pipeline {
 	agent none
   stages {
-  	stage('Maven Install') {
-    	agent {
-      	docker {
-        	image 'maven:3.5.0'
-        }
-      }
-      steps {
-      	sh 'mvn clean install'
-      }
+  	stages {
+       stage('Build') {
+          steps {
+            withMaven(maven: 'MAVEN_ENV') {
+                sh "mvn clean build"
+            }
+          }
+       }
     }
     stage('Docker Build') {
     	agent any
